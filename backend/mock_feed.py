@@ -88,7 +88,7 @@ def start_mock_feed(interval=30):
                     # Add updated_at timestamp
                     o["updated_at"] = datetime.utcnow()
                     # Add raw as JSON string
-                    o["raw"] = json.dumps(o)
+                    o["raw"] = json.dumps(o, default=str)
 
                     try:
                         upsert_odds(db, o)
