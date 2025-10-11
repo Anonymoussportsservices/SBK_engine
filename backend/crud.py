@@ -1,14 +1,16 @@
-from .models import Odds, Bet
-from sqlalchemy.orm import Session
 import json
+from datetime import datetime
+from sqlalchemy.orm import Session
 
 def list_odds(db: Session, limit: int = 200):
+    from .models import Odds  # local import to avoid circular import
     return [o.__dict__ for o in db.query(Odds)
             .order_by(Odds.updated_at.desc())
             .limit(limit)
             .all()]
 
 def create_bet(db: Session, bet_payload: dict):
+    from .models import Bet  # local import to avoid circular import
     b = Bet(
         user_id=bet_payload.get("user_id"),
         event_id=bet_payload.get("event_id"),
@@ -24,10 +26,13 @@ def create_bet(db: Session, bet_payload: dict):
     return {"id": b.id, "status": b.status, "created_at": str(b.created_at)}
 
 def upsert_odds(db: Session, o: dict):
-    """Simple upsert for Odds by event_id + market + selection."""
+    from .models import Odds  # local import to avoid circular import
+    from json import dumps
+
+    # Ensure 'raw' is a JSON string
     raw_value = o.get("raw") or o
     if isinstance(raw_value, dict):
-        raw_value = json.dumps(raw_value)
+        raw_value = dumps(raw_value)
 
     q = db.query(Odds).filter(
         Odds.event_id == o.get("event_id"),
@@ -38,7 +43,6 @@ def upsert_odds(db: Session, o: dict):
     if existing:
         existing.price = float(o.get("price", existing.price))
         existing.raw = raw_value
-        existing.updated_at = o.get("updated_at")
         db.add(existing)
         db.commit()
         db.refresh(existing)
@@ -46,7 +50,7 @@ def upsert_odds(db: Session, o: dict):
     else:
         new_data = {k: v for k, v in o.items() if k in ("event_id", "market", "selection", "price")}
         new_data["raw"] = raw_value
-        new_data["updated_at"] = o.get("updated_at")
+        new_data["updated_at"] = o.get("updated_at", datetime.utcnow())
         new = Odds(**new_data)
         db.add(new)
         db.commit()
