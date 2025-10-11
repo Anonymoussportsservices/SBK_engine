@@ -1,9 +1,8 @@
 import os
 import threading
 from fastapi import FastAPI
-from backend.db import init_db       # adjust import if needed
-from backend import mock_feed        # adjust import if needed
-from backend import crud, get_db_session  # import your DB helpers
+from backend.db import init_db, get_db_session
+from backend import mock_feed, crud  # adjust imports if needed
 
 app = FastAPI()
 
@@ -52,19 +51,6 @@ def get_odds():
 # ----------------------
 @app.post("/api/v1/bets")
 def place_bet(bet: dict):
-    # simple endpoint for MVP testing
     with get_db_session() as s:
         created = crud.create_bet(s, bet)
         return created
-
-# ----------------------
-# Example function for preventive check
-# ----------------------
-def example_function():
-    # This is a safe placeholder
-    for i in range(3):
-        print(f"Loop iteration {i}")
-    if True:
-        print("If block inside function works correctly")
-    else:
-        print("Else block inside function works correctly")
