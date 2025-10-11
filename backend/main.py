@@ -56,3 +56,15 @@ def place_bet(bet: dict):
     with get_db_session() as s:
         created = crud.create_bet(s, bet)
         return created
+
+# ----------------------
+# Example function for preventive check
+# ----------------------
+def example_function():
+    # This is a safe placeholder
+    for i in range(3):
+        print(f"Loop iteration {i}")
+    if True:
+        print("If block inside function works correctly")
+    else:
+        print("Else block inside function works correctly")
