@@ -2,13 +2,11 @@ from .models import Odds, Bet
 from sqlalchemy.orm import Session
 import json
 
-
 def list_odds(db: Session, limit: int = 200):
     return [o.__dict__ for o in db.query(Odds)
             .order_by(Odds.updated_at.desc())
             .limit(limit)
             .all()]
-
 
 def create_bet(db: Session, bet_payload: dict):
     b = Bet(
@@ -25,13 +23,12 @@ def create_bet(db: Session, bet_payload: dict):
     db.refresh(b)
     return {"id": b.id, "status": b.status, "created_at": str(b.created_at)}
 
-
 def upsert_odds(db: Session, o: dict):
-    # convert raw dict to JSON string
-    if "raw" in o and isinstance(o["raw"], dict):
-        o["raw"] = json.dumps(o["raw"])
+    """Simple upsert for Odds by event_id + market + selection."""
+    raw_value = o.get("raw") or o
+    if isinstance(raw_value, dict):
+        raw_value = json.dumps(raw_value)
 
-    # simple upsert by event_id + market + selection
     q = db.query(Odds).filter(
         Odds.event_id == o.get("event_id"),
         Odds.market == o.get("market"),
@@ -40,13 +37,17 @@ def upsert_odds(db: Session, o: dict):
     existing = q.first()
     if existing:
         existing.price = float(o.get("price", existing.price))
-        existing.raw = o.get("raw", existing.raw)
+        existing.raw = raw_value
+        existing.updated_at = o.get("updated_at")
         db.add(existing)
         db.commit()
         db.refresh(existing)
         return existing
     else:
-        new = Odds(**{k: v for k, v in o.items() if k in ("event_id", "market", "selection", "price", "raw")})
+        new_data = {k: v for k, v in o.items() if k in ("event_id", "market", "selection", "price")}
+        new_data["raw"] = raw_value
+        new_data["updated_at"] = o.get("updated_at")
+        new = Odds(**new_data)
         db.add(new)
         db.commit()
         db.refresh(new)
