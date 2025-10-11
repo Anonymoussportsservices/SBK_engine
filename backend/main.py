@@ -1,44 +1,37 @@
 # main.py - minimal FastAPI app
 import os
 import threading
-from fastapi import FastAPI, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from db import init_db, get_db_session
-import crud
-import mock_feed
+from fastapi import FastAPI
+from backend.db import init_db  # adjust import if needed
+from backend import mock_feed    # adjust import if needed
 
+app = FastAPI()
 
-app = FastAPI(title="MVP Sportsbook API")
-
-
+# ----------------------
 # CORS
+# ----------------------
 origins = os.getenv("CORS_ORIGINS", "*")
 if origins == "*":
-allow_origins = ["*"]
+    allow_origins = ["*"]
 else:
-allow_origins = [o.strip() for o in origins.split(",")]
+    allow_origins = [o.strip() for o in origins.split(",")]
 
-
-app.add_middleware(
-CORSMiddleware,
-allow_origins=allow_origins,
-allow_credentials=True,
-allow_methods=["*"],
-allow_headers=["*"],
-)
-
-
+# ----------------------
+# Startup event
+# ----------------------
 @app.on_event("startup")
 def on_startup():
-# init DB (create tables if not exist)
-init_db(os.getenv("DATABASE_URL"))
+    # init DB (create tables if not exist)
+    init_db(os.getenv("DATABASE_URL"))
 
-
-# optionally start mock feed in background thread
-use_mock = os.getenv("USE_MOCK_FEED", "true").lower() in ("1","true","yes")
+# ----------------------
+# Optionally start mock feed in background thread
+# ----------------------
+use_mock = os.getenv("USE_MOCK_FEED", "true").lower() in ("1", "true", "yes")
 if use_mock:
-t = threading.Thread(target=mock_feed.start_mock_feed, daemon=True)
-t.start()
+    t = threading.Thread(target=mock_feed.start_mock_feed, daemon=True)
+    t.start()
+
 
 
 
