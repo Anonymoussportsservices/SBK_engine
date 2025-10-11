@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, JSON
 from sqlalchemy.sql import func
-from db import Base
+from .db import Base
 
 
 class Odds(Base):
