@@ -1,8 +1,10 @@
 import os
 import threading
 from fastapi import FastAPI
-from .db import init_db, get_db_session
-from . import mock_feed, crud  # adjust imports if needed
+from sqlalchemy import create_engine
+from backend.db import get_db_session
+from backend.models import Base
+from backend import mock_feed, crud  # adjust imports if needed
 
 app = FastAPI()
 
@@ -18,20 +20,19 @@ else:
 # ----------------------
 # Startup event
 # ----------------------
+def init_db(database_url=None):
+    if not database_url:
+        database_url = os.getenv("DATABASE_URL", "sqlite:///./data.db")
+    engine = create_engine(database_url, connect_args={"check_same_thread": False})
+    Base.metadata.create_all(bind=engine)  # creates tables
+
 @app.on_event("startup")
 def on_startup():
     init_db()
+    use_mock = os.getenv("USE_MOCK_FEED", "true").lower() in ("1", "true", "yes")
     if use_mock:
         t = threading.Thread(target=mock_feed.start_mock_feed, daemon=True)
         t.start()
-
-# ----------------------
-# Optionally start mock feed in background thread
-# ----------------------
-use_mock = os.getenv("USE_MOCK_FEED", "true").lower() in ("1", "true", "yes")
-if use_mock:
-    t = threading.Thread(target=mock_feed.start_mock_feed, daemon=True)
-    t.start()
 
 # ----------------------
 # Health check endpoint
@@ -56,3 +57,4 @@ def place_bet(bet: dict):
     with get_db_session() as s:
         created = crud.create_bet(s, bet)
         return created
+
