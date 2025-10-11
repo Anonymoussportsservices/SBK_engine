@@ -44,6 +44,10 @@ def health():
 # ----------------------
 # Odds endpoint
 # ----------------------
+@app.get("/")
+def root():
+    return {"message": "API is running"}
+
 @app.get("/api/v1/odds")
 def get_odds():
     with get_db_session() as s:
