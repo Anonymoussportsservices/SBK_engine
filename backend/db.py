@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite:///./dev.db"
+DATABASE_URL = os.getenv("DATABASE_URL") or ""sqlite:///./data.db""
 
 # echo can be turned on for debugging
 engine = create_engine(

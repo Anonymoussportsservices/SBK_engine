@@ -1,8 +1,8 @@
 import os
 import threading
 from fastapi import FastAPI
-from backend.db import init_db, get_db_session
-from backend import mock_feed, crud  # adjust imports if needed
+from .db import init_db, get_db_session
+from . import mock_feed, crud  # adjust imports if needed
 
 app = FastAPI()
 
@@ -20,8 +20,10 @@ else:
 # ----------------------
 @app.on_event("startup")
 def on_startup():
-    # init DB (create tables if not exist)
-    init_db(os.getenv("DATABASE_URL"))
+    init_db()
+    if use_mock:
+        t = threading.Thread(target=mock_feed.start_mock_feed, daemon=True)
+        t.start()
 
 # ----------------------
 # Optionally start mock feed in background thread
