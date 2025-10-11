@@ -1,8 +1,9 @@
 # mock_feed.py - simple file that periodically inserts/updates odds for testing
 import time
 import random
-from db import get_db_session
-from crud import upsert_odds  # move import to top for clarity
+from backend.db import get_db_session
+from backend.crud import upsert_odds
+
 
 SAMPLE_EVENTS = [
     {"event_id": "MLB_1", "market": "moneyline", "selection": "home", "price": 1.85},
