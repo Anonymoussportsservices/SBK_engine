@@ -1,9 +1,9 @@
-# main.py - minimal FastAPI app
 import os
 import threading
 from fastapi import FastAPI
-from backend.db import init_db  # adjust import if needed
-from backend import mock_feed    # adjust import if needed
+from backend.db import init_db       # adjust import if needed
+from backend import mock_feed        # adjust import if needed
+from backend import crud, get_db_session  # import your DB helpers
 
 app = FastAPI()
 
@@ -32,28 +32,27 @@ if use_mock:
     t = threading.Thread(target=mock_feed.start_mock_feed, daemon=True)
     t.start()
 
-
-
-
-
+# ----------------------
+# Health check endpoint
+# ----------------------
 @app.get("/health")
 def health():
-return {"status": "ok"}
+    return {"status": "ok"}
 
-
-
-
+# ----------------------
+# Odds endpoint
+# ----------------------
 @app.get("/api/v1/odds")
 def get_odds():
-with get_db_session() as s:
-return crud.list_odds(s)
+    with get_db_session() as s:
+        return crud.list_odds(s)
 
-
-
-
+# ----------------------
+# Place bet endpoint
+# ----------------------
 @app.post("/api/v1/bets")
 def place_bet(bet: dict):
-# simple endpoint for MVP testing
-with get_db_session() as s:
-created = crud.create_bet(s, bet)
-return created
+    # simple endpoint for MVP testing
+    with get_db_session() as s:
+        created = crud.create_bet(s, bet)
+        return created
