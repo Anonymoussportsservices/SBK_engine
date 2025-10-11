@@ -17,17 +17,17 @@ Base = declarative_base()
 
 
 def init_db(url=None):
-# create tables
-from models import Odds, Bet
-Base.metadata.create_all(bind=engine)
+    # create tables
+    from models import Odds, Bet
+    Base.metadata.create_all(bind=engine)
 
 
 
 
 @contextmanager
 def get_db_session():
-db = SessionLocal()
-try:
-yield db
-finally:
-db.close()
+    db = SessionLocal()
+    try:
+    yield db
+    finally:
+    db.close()
