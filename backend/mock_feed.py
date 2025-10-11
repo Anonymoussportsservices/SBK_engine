@@ -1,8 +1,9 @@
 # mock_feed.py - simple file that periodically inserts/updates odds for testing
 import time
 import random
-from backend.db import get_db_session
-from backend.crud import upsert_odds
+from .crud import upsert_odds
+from .db import get_db_session
+
 
 
 SAMPLE_EVENTS = [

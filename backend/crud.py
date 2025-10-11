@@ -1,5 +1,5 @@
 # crud.py - very small helper functions for MVP
-from models import Odds, Bet
+from .models import Odds, Bet
 from sqlalchemy.orm import Session
 
 
