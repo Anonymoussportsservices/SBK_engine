@@ -1,6 +1,6 @@
-# crud.py - very small helper functions for MVP
 from .models import Odds, Bet
 from sqlalchemy.orm import Session
+import json
 
 
 def list_odds(db: Session, limit: int = 200):
@@ -18,7 +18,7 @@ def create_bet(db: Session, bet_payload: dict):
         selection=bet_payload.get("selection"),
         stake=float(bet_payload.get("stake", 0)),
         odds_at_bet=float(bet_payload.get("odds_at_bet", 0)),
-        raw=bet_payload,
+        raw=json.dumps(bet_payload),  # store as JSON string
     )
     db.add(b)
     db.commit()
@@ -27,6 +27,10 @@ def create_bet(db: Session, bet_payload: dict):
 
 
 def upsert_odds(db: Session, o: dict):
+    # convert raw dict to JSON string
+    if "raw" in o and isinstance(o["raw"], dict):
+        o["raw"] = json.dumps(o["raw"])
+
     # simple upsert by event_id + market + selection
     q = db.query(Odds).filter(
         Odds.event_id == o.get("event_id"),
@@ -36,7 +40,7 @@ def upsert_odds(db: Session, o: dict):
     existing = q.first()
     if existing:
         existing.price = float(o.get("price", existing.price))
-        existing.raw = o
+        existing.raw = o.get("raw", existing.raw)
         db.add(existing)
         db.commit()
         db.refresh(existing)
