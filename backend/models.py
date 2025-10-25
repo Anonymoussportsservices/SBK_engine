@@ -1,8 +1,18 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, JSON
 from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String
+from backend.db import Base
 from datetime import datetime
 
 Base = declarative_base()  # ✅ must come first and no circular imports
+# backend/models.py
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
 
 
 class Odds(Base):

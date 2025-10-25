@@ -1,0 +1,52 @@
+# ---------------------------
+# Python & FastAPI ignores
+# ---------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Environment files (real keys never go public)
+.env
+.env.local
+
+# Byte-compiled / cache
+*.log
+*.tmp
+*.bak
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Coverage / test / cache
+htmlcov/
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+.cache/
+
+# Node (if using frontend)
+node_modules/
+
+# ---------------------------
+# Custom project exclusions
+# ---------------------------
+data/
+uploads/
