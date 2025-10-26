@@ -1,9 +1,0 @@
-# --- Core Dependencies ---
-fastapi==0.115.1
-uvicorn[standard]==0.25.0
-sqlalchemy==2.0.24
-python-dotenv==1.0.0
-requests==2.32.0
-python-jose==3.3.0
-passlib[bcrypt]==1.7.4
-
